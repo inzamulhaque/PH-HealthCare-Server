@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { createAdminIntoDB } from "./user.services";
+import { getAllAdminFromDB } from "./admin.service";
 
-const createAdmin = async (req: Request, res: Response) => {
+const getAllAdmin = async (req: Request, res: Response) => {
   try {
-    const result = await createAdminIntoDB(req.body);
+    const result = await getAllAdminFromDB(req.query);
 
     res.status(200).json({
       success: true,
-      message: "Admin Created Successfully!",
+      message: "Admin Data Fetched!",
       data: result,
     });
   } catch (error: any) {
@@ -19,4 +19,4 @@ const createAdmin = async (req: Request, res: Response) => {
   }
 };
 
-export { createAdmin };
+export { getAllAdmin };
