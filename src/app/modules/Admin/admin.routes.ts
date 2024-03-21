@@ -6,6 +6,8 @@ import {
   getAllAdmin,
   updateAdminById,
 } from "./admin.controller";
+import validateRequest from "../../middlewares/validateRequest";
+import { adminUpdatevalidationSchema } from "./admin.validations";
 
 const router: Router = Router();
 
@@ -13,7 +15,11 @@ router.get("/", getAllAdmin);
 
 router.get("/:id", getAdminById);
 
-router.patch("/:id", updateAdminById);
+router.patch(
+  "/:id",
+  validateRequest(adminUpdatevalidationSchema),
+  updateAdminById
+);
 
 router.delete("/:id", deleteAdminById);
 
