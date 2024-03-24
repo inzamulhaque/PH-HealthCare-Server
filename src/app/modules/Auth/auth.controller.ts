@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import {
   changePasswordService,
+  forgotPasswordService,
   loginService,
   refreshTokenService,
+  resetPasswordService,
 } from "./auth.services";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
@@ -57,4 +59,34 @@ const changePassword = catchAsync(
   }
 );
 
-export { loginUser, refreshToken, changePassword };
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  await forgotPasswordService(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Check your email!",
+    data: null,
+  });
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization || "";
+
+  await resetPasswordService(token, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password Reset!",
+    data: null,
+  });
+});
+
+export {
+  loginUser,
+  refreshToken,
+  changePassword,
+  forgotPassword,
+  resetPassword,
+};
