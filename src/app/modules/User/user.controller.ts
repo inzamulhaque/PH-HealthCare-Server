@@ -1,22 +1,25 @@
 import { Request, Response } from "express";
-import { createAdminIntoDB } from "./user.services";
+import { createAdminIntoDB, createDoctorIntoDB } from "./user.services";
+import catchAsync from "../../../shared/catchAsync";
 
-const createAdmin = async (req: Request, res: Response) => {
-  try {
-    const result = await createAdminIntoDB(req);
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await createAdminIntoDB(req);
 
-    res.status(200).json({
-      success: true,
-      message: "Admin Created Successfully!",
-      data: result,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error?.name || "Something went wrong",
-      error,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    message: "Admin Created Successfully!",
+    data: result,
+  });
+});
 
-export { createAdmin };
+const createDoctor = catchAsync(async (req: Request, res: Response) => {
+  const result = await createDoctorIntoDB(req);
+
+  res.status(200).json({
+    success: true,
+    message: "Doctor Created successfuly!",
+    data: result,
+  });
+});
+
+export { createAdmin, createDoctor };

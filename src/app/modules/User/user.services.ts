@@ -7,17 +7,16 @@ import { IFile } from "../../interfaces/file";
 
 const createAdminIntoDB = async (req: Request) => {
   const file = req.file as IFile;
-  console.log(req.body.password);
 
   if (file) {
-    const uploadprofileImg = await uploadToCloudinary(file);
-    req.body.admin.profilePhoto = uploadprofileImg?.secure_url;
+    const uploadToProfileImg = await uploadToCloudinary(file);
+    req.body.admin.profilePhoto = uploadToProfileImg?.secure_url;
   }
 
-  const hashedPassword: string = await bcrypt.hash(req.body.data.password, 12);
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
 
   const userData = {
-    email: req.body.data.admin.email,
+    email: req.body.admin.email,
     password: hashedPassword,
     role: UserRole.ADMIN,
   };
@@ -28,7 +27,7 @@ const createAdminIntoDB = async (req: Request) => {
     });
 
     const createdAdminData = await transactionClient.admin.create({
-      data: req.body.data.admin,
+      data: req.body.admin,
     });
 
     return createdAdminData;
@@ -37,4 +36,35 @@ const createAdminIntoDB = async (req: Request) => {
   return result;
 };
 
-export { createAdminIntoDB };
+const createDoctorIntoDB = async (req: Request) => {
+  const file = req.file as IFile;
+
+  if (file) {
+    const uploadToProfileImg = await uploadToCloudinary(file);
+    req.body.doctor.profilePhoto = uploadToProfileImg?.secure_url;
+  }
+
+  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+
+  const userData = {
+    email: req.body.doctor.email,
+    password: hashedPassword,
+    role: UserRole.DOCTOR,
+  };
+
+  const result = await prisma.$transaction(async (transactionClient) => {
+    await transactionClient.user.create({
+      data: userData,
+    });
+
+    const createdDoctorData = await transactionClient.doctor.create({
+      data: req.body.doctor,
+    });
+
+    return createdDoctorData;
+  });
+
+  return result;
+};
+
+export { createAdminIntoDB, createDoctorIntoDB };
