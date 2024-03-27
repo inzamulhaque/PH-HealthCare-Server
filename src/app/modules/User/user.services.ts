@@ -1,4 +1,11 @@
-import { Admin, Doctor, Patient, Prisma, UserRole } from "@prisma/client";
+import {
+  Admin,
+  Doctor,
+  Patient,
+  Prisma,
+  UserRole,
+  UserStatus,
+} from "@prisma/client";
 import bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
 import { Request } from "express";
@@ -172,7 +179,7 @@ const getAllUserFromDB = async (params: any, options: IPaginationOptions) => {
   };
 };
 
-const changeProfileStatusIntoDB = async (id: string, status: UserRole) => {
+const changeProfileStatusIntoDB = async (id: string, status: UserStatus) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       id,
