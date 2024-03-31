@@ -5,6 +5,7 @@ import {
   createDoctor,
   createPatient,
   getAllUser,
+  getMyProfile,
 } from "./user.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
@@ -20,6 +21,12 @@ import validateRequest from "../../middlewares/validateRequest";
 const router = express.Router();
 
 router.get("/", auth(UserRole.SUPER_ADMIN, UserRole.ADMIN), getAllUser);
+
+router.get(
+  "/me",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  getMyProfile
+);
 
 router.post(
   "/create-admin",

@@ -5,12 +5,14 @@ import {
   createDoctorIntoDB,
   createPatientIntoDB,
   getAllUserFromDB,
+  getMyProfileFromDB,
 } from "./user.services";
 import catchAsync from "../../../shared/catchAsync";
 import pick from "../../../shared/pick";
 import { userFilterableFields } from "./user.constant";
 import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
+import { JwtPayload } from "jsonwebtoken";
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const result = await createAdminIntoDB(req);
@@ -70,10 +72,24 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyProfile = catchAsync(
+  async (req: Request & JwtPayload, res: Response) => {
+    const result = await getMyProfileFromDB(req.user);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My profile data fetched!",
+      data: result,
+    });
+  }
+);
+
 export {
   createAdmin,
   createDoctor,
   createPatient,
   getAllUser,
   changeProfileStatus,
+  getMyProfile,
 };

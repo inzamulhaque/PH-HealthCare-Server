@@ -14,6 +14,7 @@ import { IFile } from "../../interfaces/file";
 import { paginationHelper } from "../../../helpars/paginationHelper";
 import { IPaginationOptions } from "../../interfaces/pagination";
 import { userSearchAbleFields } from "./user.constant";
+import { JwtPayload } from "jsonwebtoken";
 
 const createAdminIntoDB = async (req: Request): Promise<Admin> => {
   const file = req.file as IFile;
@@ -196,10 +197,57 @@ const changeProfileStatusIntoDB = async (id: string, status: UserStatus) => {
   return updateUserStatus;
 };
 
+const getMyProfileFromDB = async (user: JwtPayload) => {
+  const userInfo = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+      status: UserStatus.ACTIVE,
+    },
+    select: {
+      id: true,
+      email: true,
+      needPasswordChange: true,
+      role: true,
+      status: true,
+    },
+  });
+
+  let profileInfo;
+
+  if (userInfo.role === UserRole.SUPER_ADMIN) {
+    profileInfo = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.ADMIN) {
+    profileInfo = await prisma.admin.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.DOCTOR) {
+    profileInfo = await prisma.doctor.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  } else if (userInfo.role === UserRole.PATIENT) {
+    profileInfo = await prisma.patient.findUnique({
+      where: {
+        email: userInfo.email,
+      },
+    });
+  }
+
+  return { ...userInfo, ...profileInfo };
+};
+
 export {
   createAdminIntoDB,
   createDoctorIntoDB,
   createPatientIntoDB,
   getAllUserFromDB,
   changeProfileStatusIntoDB,
+  getMyProfileFromDB,
 };
