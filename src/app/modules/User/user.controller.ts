@@ -6,6 +6,7 @@ import {
   createPatientIntoDB,
   getAllUserFromDB,
   getMyProfileFromDB,
+  updateMyProfieIntoDB,
 } from "./user.services";
 import catchAsync from "../../../shared/catchAsync";
 import pick from "../../../shared/pick";
@@ -85,6 +86,21 @@ const getMyProfile = catchAsync(
   }
 );
 
+const updateMyProfie = catchAsync(
+  async (req: Request & JwtPayload, res: Response) => {
+    const user = req.user;
+
+    const result = await updateMyProfieIntoDB(user, req);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My profile updated!",
+      data: result,
+    });
+  }
+);
+
 export {
   createAdmin,
   createDoctor,
@@ -92,4 +108,5 @@ export {
   getAllUser,
   changeProfileStatus,
   getMyProfile,
+  updateMyProfie,
 };

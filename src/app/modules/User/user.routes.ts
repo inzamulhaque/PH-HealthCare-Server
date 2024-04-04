@@ -6,6 +6,7 @@ import {
   createPatient,
   getAllUser,
   getMyProfile,
+  updateMyProfie,
 } from "./user.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
@@ -62,6 +63,16 @@ router.patch(
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(updateStatusValidationSchema),
   changeProfileStatus
+);
+
+router.patch(
+  "/update-my-profile",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    return updateMyProfie(req, res, next);
+  }
 );
 
 export const UserRoutes = router;
