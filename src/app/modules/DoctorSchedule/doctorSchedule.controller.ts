@@ -3,6 +3,7 @@ import catchAsync from "../../../shared/catchAsync";
 import { JwtPayload } from "jsonwebtoken";
 import {
   createDoctorShedilesIntoDB,
+  deleteScheduleFromDBService,
   getMyScheduleService,
 } from "./doctorSchedule.service";
 import sendResponse from "../../../shared/sendResponse";
@@ -44,4 +45,20 @@ const getMySchedule = catchAsync(
   }
 );
 
-export { createDoctorShediles, getMySchedule };
+const deleteScheduleFromDB = catchAsync(
+  async (req: Request & { user?: JwtPayload }, res: Response) => {
+    const user = req.user;
+    const { id } = req.params;
+
+    const result = await deleteScheduleFromDBService(user as JwtPayload, id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "My Schedule deleted successfully!",
+      data: result,
+    });
+  }
+);
+
+export { createDoctorShediles, getMySchedule, deleteScheduleFromDB };
