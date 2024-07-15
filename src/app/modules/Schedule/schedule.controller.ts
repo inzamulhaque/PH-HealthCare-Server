@@ -2,7 +2,12 @@ import { Request, Response } from "express";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
-import { createScheduleIntoDB, getAllScheduleFromDB } from "./schedule.sevice";
+import {
+  createScheduleIntoDB,
+  deleteScheduleFromDB,
+  getAllScheduleFromDB,
+  getScheduleByIdFromDB,
+} from "./schedule.sevice";
 import { JwtPayload } from "jsonwebtoken";
 import pick from "../../../shared/pick";
 
@@ -34,4 +39,26 @@ const getAllSchedule = catchAsync(
   }
 );
 
-export { createSchedule, getAllSchedule };
+const getScheduleById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await getScheduleByIdFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Schedule retrieval successfully",
+    data: result,
+  });
+});
+
+const deleteSchedule = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await deleteScheduleFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Schedule deleted successfully",
+    data: result,
+  });
+});
+
+export { createSchedule, getAllSchedule, getScheduleById, deleteSchedule };
