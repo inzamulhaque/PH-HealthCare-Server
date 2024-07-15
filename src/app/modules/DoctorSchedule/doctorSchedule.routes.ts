@@ -4,12 +4,19 @@ import { createDoctorScheduleValidationSchema } from "./doctorSchedule.validatio
 import {
   createDoctorShediles,
   deleteScheduleFromDB,
+  getAllDoctorSchedule,
   getMySchedule,
 } from "./doctorSchedule.controller";
 import { UserRole } from "@prisma/client";
 import auth from "../../middlewares/auth";
 
 const router: Router = Router();
+
+router.get(
+  "/",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR, UserRole.PATIENT),
+  getAllDoctorSchedule
+);
 
 router.post(
   "/",

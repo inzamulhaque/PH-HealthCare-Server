@@ -4,11 +4,26 @@ import { JwtPayload } from "jsonwebtoken";
 import {
   createDoctorShedilesIntoDB,
   deleteScheduleFromDBService,
+  getAllDoctorScheduleFromDB,
   getMyScheduleService,
 } from "./doctorSchedule.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import pick from "../../../shared/pick";
+import { scheduleFilterableFields } from "./doctorSchedule.constants";
+
+const getAllDoctorSchedule = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, scheduleFilterableFields);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const result = await getAllDoctorScheduleFromDB(filters, options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Doctor Schedule retrieval successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
 const createDoctorShediles = catchAsync(
   async (req: Request & JwtPayload, res: Response) => {
@@ -61,4 +76,9 @@ const deleteScheduleFromDB = catchAsync(
   }
 );
 
-export { createDoctorShediles, getMySchedule, deleteScheduleFromDB };
+export {
+  createDoctorShediles,
+  getMySchedule,
+  deleteScheduleFromDB,
+  getAllDoctorSchedule,
+};
