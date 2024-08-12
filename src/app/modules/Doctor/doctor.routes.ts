@@ -9,10 +9,7 @@ import {
   softDeleteDoctor,
   updateDoctor,
 } from "./doctor.controller";
-import {
-  createDoctorValidationSchema,
-  updateDoctorValidationSchema,
-} from "./doctor.validation";
+import { updateDoctorValidationSchema } from "./doctor.validation";
 
 const router = express.Router();
 

@@ -142,7 +142,7 @@ const updateDoctorIntoDB = async (id: string, payload: IDoctorUpdate) => {
       const createSpecialtiesIds = specialties.filter(
         (specialty) => !specialty.isDeleted
       );
-      console.log(createSpecialtiesIds);
+      // console.log(createSpecialtiesIds);
       for (const specialty of createSpecialtiesIds) {
         await transactionClient.doctorSpecialties.create({
           data: {
