@@ -1,6 +1,9 @@
 import { JwtPayload } from "jsonwebtoken";
 import prisma from "../../../shared/prisma";
 import { v4 as uuidv4 } from "uuid";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { paginationHelper } from "../../../helpars/paginationHelper";
+import { Prisma, UserRole } from "@prisma/client";
 
 const createAppointmentIntoDB = async (
   user: JwtPayload,
@@ -78,4 +81,91 @@ const createAppointmentIntoDB = async (
   return result;
 };
 
-export { createAppointmentIntoDB };
+const getMyAppointmentService = async (
+  user: JwtPayload,
+  filters: any,
+  options: IPaginationOptions
+) => {
+  const { limit, page, skip } = paginationHelper.calculatePagination(options);
+
+  // const patientData = await prisma.patient.findUniqueOrThrow({
+  //   where: {
+  //     email: user.email,
+  //   },
+  // });
+
+  const andCondition: Prisma.AppointmentWhereInput[] = [];
+
+  if (user.role === UserRole.PATIENT) {
+    andCondition.push({
+      patient: {
+        email: user.email,
+      },
+    });
+  } else if ((user.role = UserRole.DOCTOR)) {
+    andCondition.push({
+      doctor: {
+        email: user.email,
+      },
+    });
+  }
+
+  // if (patientData) {
+  //   andCondition.push({
+  //     patientId: patientData.id,
+  //   });
+  // }
+
+  if (Object.keys(filters).length > 0) {
+    const filterCondition = Object.keys(filters).map((key) => ({
+      [key]: {
+        equals: filters[key],
+      },
+    }));
+
+    andCondition.push(...filterCondition);
+  }
+
+  const whereCondition: Prisma.AppointmentWhereInput =
+    andCondition.length > 0 ? { AND: andCondition } : {};
+
+  const result = await prisma.appointment.findMany({
+    where: whereCondition,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : { createdAt: "asc" },
+    include:
+      user.role === UserRole.PATIENT
+        ? {
+            doctor: true,
+            schedule: true,
+          }
+        : {
+            patient: {
+              include: {
+                medicalReport: true,
+                patientHealthData: true,
+              },
+            },
+            schedule: true,
+          },
+  });
+
+  const total = await prisma.appointment.count({
+    where: whereCondition,
+  });
+
+  return {
+    meta: {
+      total,
+      page,
+      limit,
+    },
+    data: result,
+  };
+};
+
+export { createAppointmentIntoDB, getMyAppointmentService };
