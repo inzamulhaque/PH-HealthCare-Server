@@ -66,6 +66,7 @@ model Doctor {
   doctorSchedules     DoctorSchedules[]
   appointment         Appointment[]
   prescription        Prescription[]
+  review              Review[]
 
   @@map("doctors")
 }
@@ -86,6 +87,7 @@ model Patient {
   medicalReport     MedicalReport[]
   appointment       Appointment[]
   prescription      Prescription[]
+  review            Review[]
 
   @@map("patients")
 }
@@ -196,6 +198,7 @@ model Appointment {
   DoctorSchedules DoctorSchedules?
   payment         Payment?
   prescription    Prescription?
+  review          Review?
 
   @@map("appointments")
 }
@@ -234,6 +237,25 @@ model Prescription {
   updatedAt DateTime @updatedAt
 
   @@map("prescription")
+}
+
+model Review {
+  id       String @id @default(uuid())
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  rating    Float
+  comment   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
 }
 
 enum UserRole {
