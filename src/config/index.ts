@@ -24,4 +24,9 @@ export default {
     api_key: process.env.API_KEY,
     api_secret: process.env.API_SECRET,
   },
+
+  sslcz: {
+    sslcz_store_id: process.env.SSLCZ_STORE_ID,
+    sslcz_store_passwd: process.env.SSLCZ_STORE_PASSWD,
+  },
 };
