@@ -28,5 +28,10 @@ export default {
   sslcz: {
     sslcz_store_id: process.env.SSLCZ_STORE_ID,
     sslcz_store_passwd: process.env.SSLCZ_STORE_PASSWD,
+    sslcz_success_url: process.env.SSLCZ_SUCCESS_URL,
+    sslcz_cancel_url: process.env.SSLCZ_CANCEL_URL,
+    sslcz_fail_url: process.env.SSLCZ_FAIL_URL,
+    sslcz_payment_api: process.env.SSLCZ_PAYMENT_API,
+    sslcz_validation_api: process.env.SSLCZ_VALIDATION_API,
   },
 };
