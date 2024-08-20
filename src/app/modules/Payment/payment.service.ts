@@ -47,8 +47,10 @@ const validatePaymentService = async (payload: any) => {
     };
   }
 
+  // const response = payload;
+
   await prisma.$transaction(async (tx) => {
-    await tx.payment.updateMany({
+    const updatedPaymentData = await tx.payment.update({
       where: {
         transactionId: response.tran_id,
       },
@@ -57,7 +59,20 @@ const validatePaymentService = async (payload: any) => {
         paymentGatewayData: response,
       },
     });
+
+    await tx.appointment.update({
+      where: {
+        id: updatedPaymentData.appointmentId,
+      },
+      data: {
+        paymentStatus: PaymentStatus.PAID,
+      },
+    });
   });
+
+  return {
+    message: "Payment Success!",
+  };
 };
 
 export { initPaymentService, validatePaymentService };
