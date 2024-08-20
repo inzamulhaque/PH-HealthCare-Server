@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { initPayment } from "./payment.controller";
+import { initPayment, validatePayment } from "./payment.controller";
 
 const router: Router = Router();
+
+router.get("/ipn", validatePayment);
 
 router.post("/init-payment/:appointmentID", initPayment);
 

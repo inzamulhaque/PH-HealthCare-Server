@@ -52,4 +52,23 @@ const initPayment = async (paymentData: IPaymentData) => {
   }
 };
 
-export { initPayment };
+const sslValidatePaymentService = async (payload: any) => {
+  try {
+    const response = await axios({
+      method: "GET",
+      url: `${config.sslcz.sslcz_validation_api}?val_id=${payload.val_id}&store_id=${config.sslcz.sslcz_store_id}&store_passwd=${config.sslcz.sslcz_store_passwd}&format=json`,
+    });
+
+    // if (response.status !== "VALID") {
+    //   return {
+    //     message: "Payment Failed",
+    //   };
+    // }
+
+    return response.data;
+  } catch (err) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Payment validation failed!");
+  }
+};
+
+export { initPayment, sslValidatePaymentService };
