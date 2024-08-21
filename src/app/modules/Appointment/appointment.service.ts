@@ -226,7 +226,34 @@ const cancelUnpaidAppointmentsService = async () => {
     (appointment) => appointment.id
   );
 
-  console.log(appointmentIdsToCancel);
+  await prisma.$transaction(async (tx) => {
+    await tx.payment.deleteMany({
+      where: {
+        appointmentId: {
+          in: appointmentIdsToCancel,
+        },
+      },
+    });
+
+    await tx.appointment.deleteMany({
+      where: {
+        id: {
+          in: appointmentIdsToCancel,
+        },
+      },
+    });
+
+    await tx.doctorSchedules.updateMany({
+      where: {
+        appointmentId: {
+          in: appointmentIdsToCancel,
+        },
+      },
+      data: {
+        isBooked: false,
+      },
+    });
+  });
 };
 
 export {
