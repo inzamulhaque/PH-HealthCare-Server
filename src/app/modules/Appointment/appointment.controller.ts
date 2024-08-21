@@ -3,6 +3,7 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import {
+  changeAppointmentStatusService,
   createAppointmentIntoDB,
   getMyAppointmentService,
 } from "./appointment.service";
@@ -41,4 +42,20 @@ const getMyAppointment = catchAsync(
   }
 );
 
-export { createAppointment, getMyAppointment };
+const changeAppointmentStatus = catchAsync(
+  async (req: Request & JwtPayload, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const result = await changeAppointmentStatusService(id, status);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Appointment Status Updated Successfully!",
+      data: result,
+    });
+  }
+);
+
+export { createAppointment, getMyAppointment, changeAppointmentStatus };

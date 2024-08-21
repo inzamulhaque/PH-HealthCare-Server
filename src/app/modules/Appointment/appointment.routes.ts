@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { createAppointment, getMyAppointment } from "./appointment.controller";
+import {
+  changeAppointmentStatus,
+  createAppointment,
+  getMyAppointment,
+} from "./appointment.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 
@@ -12,6 +16,8 @@ router.get(
   auth(UserRole.PATIENT, UserRole.DOCTOR),
   getMyAppointment
 );
+
+router.patch("/status/:id", changeAppointmentStatus);
 
 const AppointmentRoutes = router;
 export default AppointmentRoutes;

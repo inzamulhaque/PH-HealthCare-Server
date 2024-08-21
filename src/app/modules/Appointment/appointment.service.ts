@@ -3,7 +3,7 @@ import prisma from "../../../shared/prisma";
 import { v4 as uuidv4 } from "uuid";
 import { IPaginationOptions } from "../../interfaces/pagination";
 import { paginationHelper } from "../../../helpars/paginationHelper";
-import { Prisma, UserRole } from "@prisma/client";
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 
 const createAppointmentIntoDB = async (
   user: JwtPayload,
@@ -168,4 +168,30 @@ const getMyAppointmentService = async (
   };
 };
 
-export { createAppointmentIntoDB, getMyAppointmentService };
+const changeAppointmentStatusService = async (
+  appointmentId: string,
+  status: AppointmentStatus
+) => {
+  const appointmentData = await prisma.appointment.findUniqueOrThrow({
+    where: {
+      id: appointmentId,
+    },
+  });
+
+  const result = await prisma.appointment.update({
+    where: {
+      id: appointmentData.id,
+    },
+    data: {
+      status: status,
+    },
+  });
+
+  return result;
+};
+
+export {
+  createAppointmentIntoDB,
+  getMyAppointmentService,
+  changeAppointmentStatusService,
+};
