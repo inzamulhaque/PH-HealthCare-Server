@@ -46,8 +46,9 @@ const changeAppointmentStatus = catchAsync(
   async (req: Request & JwtPayload, res: Response) => {
     const { id } = req.params;
     const { status } = req.body;
+    const user = req.user;
 
-    const result = await changeAppointmentStatusService(id, status);
+    const result = await changeAppointmentStatusService(id, status, user);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
