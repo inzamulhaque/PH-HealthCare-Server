@@ -14,7 +14,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// cancelUnpaidAppointmentsService();
+cancelUnpaidAppointmentsService();
 
 app.get("/", (req: Request, res: Response) => {
   res.send({
