@@ -42,7 +42,7 @@ const createNewReviewService = async (
         id: result.doctorId,
       },
       data: {
-        averageRating: averageRating._avg.rating,
+        averageRating: averageRating._avg.rating as number,
       },
     });
 
