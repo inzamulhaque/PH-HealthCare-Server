@@ -5,30 +5,59 @@ import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 
 const fetchDashboardMetaDataService = async (user: JwtPayload) => {
+  let metaData;
+
   switch (user.role) {
     case UserRole.SUPER_ADMIN:
-      getSuperAdminMetaDataService();
+      metaData = getSuperAdminMetaDataService();
       break;
 
     case UserRole.ADMIN:
-      getAdminMetaDataService();
+      metaData = getAdminMetaDataService();
       break;
 
     case UserRole.DOCTOR:
-      getDoctorMetaDataService(user);
+      metaData = getDoctorMetaDataService(user);
       break;
 
     case UserRole.PATIENT:
-      getPatientMetaDataService();
+      metaData = getPatientMetaDataService(user);
       break;
 
     default:
       throw new ApiError(httpStatus.BAD_REQUEST, "Invalid User!");
       break;
   }
+
+  return metaData;
 };
 
-const getSuperAdminMetaDataService = async () => {};
+const getSuperAdminMetaDataService = async () => {
+  const appointmentCount = await prisma.appointment.count();
+  const adminCount = await prisma.admin.count();
+  const patientCount = await prisma.patient.count();
+  const doctorCount = await prisma.doctor.count();
+  const paymentCount = await prisma.payment.count();
+
+  const totalRevenue = await prisma.payment.aggregate({
+    where: {
+      status: PaymentStatus.PAID,
+    },
+
+    _sum: {
+      amount: true,
+    },
+  });
+
+  return {
+    appointmentCount,
+    adminCount,
+    patientCount,
+    doctorCount,
+    paymentCount,
+    totalRevenue,
+  };
+};
 
 const getAdminMetaDataService = async () => {
   const appointmentCount = await prisma.appointment.count();
@@ -46,13 +75,13 @@ const getAdminMetaDataService = async () => {
     },
   });
 
-  console.log({
+  return {
     appointmentCount,
     patientCount,
     doctorCount,
     paymentCount,
     totalRevenue,
-  });
+  };
 };
 
 const getDoctorMetaDataService = async (user: JwtPayload) => {
@@ -112,15 +141,64 @@ const getDoctorMetaDataService = async (user: JwtPayload) => {
       count: count._count.id,
     }));
 
-  console.log({
+  return {
     appointmentCount,
-    patientCount,
+    patientCount: patientCount.length,
     reviewCount,
     totalRevenue,
     formattedAppointmentStatusDistribution,
-  });
+  };
 };
 
-const getPatientMetaDataService = async () => {};
+const getPatientMetaDataService = async (user: JwtPayload) => {
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      email: user.email,
+    },
+  });
+
+  const appointmentCount = await prisma.appointment.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const prescriptionCount = await prisma.prescription.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const reviewCount = await prisma.review.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const appointmentStatusDistribution = await prisma.appointment.groupBy({
+    where: {
+      patientId: patientData.id,
+    },
+
+    by: ["status"],
+
+    _count: {
+      id: true,
+    },
+  });
+
+  const formattedAppointmentStatusDistribution =
+    appointmentStatusDistribution.map((count) => ({
+      status: count.status,
+      count: count._count.id,
+    }));
+
+  return {
+    appointmentCount,
+    prescriptionCount,
+    reviewCount,
+    formattedAppointmentStatusDistribution,
+  };
+};
 
 export { fetchDashboardMetaDataService };
