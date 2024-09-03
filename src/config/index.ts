@@ -34,4 +34,11 @@ export default {
     sslcz_payment_api: process.env.SSLCZ_PAYMENT_API,
     sslcz_validation_api: process.env.SSLCZ_VALIDATION_API,
   },
+
+  superAdmin: {
+    email: process.env.SUPER_ADMIN_EMAIL,
+    password: process.env.SUPER_ADMIN_PASSWORD,
+    name: process.env.SUPER_ADMIN_NAME,
+    contactNumber: process.env.SUPER_ADMIN_CONTACT_NUMBER,
+  },
 };
