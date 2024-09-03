@@ -6,6 +6,11 @@ import { paginationHelper } from "../../../helpars/paginationHelper";
 import { IPaginationOptions } from "../../interfaces/pagination";
 import { JwtPayload } from "jsonwebtoken";
 
+const convertDateTime = async (date: Date) => {
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() + offset);
+};
+
 const createScheduleIntoDB = async (
   payload: ISchedule
 ): Promise<Schedule[]> => {
@@ -40,9 +45,17 @@ const createScheduleIntoDB = async (
     );
 
     while (startDateTime <= endDateTime) {
+      // const scheduleData = {
+      //   startDateTime: startDateTime,
+      //   endDateTime: addMinutes(startDateTime, interverlTime),
+      // };
+
       const scheduleData = {
-        startDateTime: startDateTime,
-        endDateTime: addMinutes(startDateTime, interverlTime),
+        startDateTime: await convertDateTime(startDateTime),
+        endDateTime: addMinutes(
+          await convertDateTime(startDateTime),
+          interverlTime
+        ),
       };
 
       const existingSchedule = await prisma.schedule.findFirst({
